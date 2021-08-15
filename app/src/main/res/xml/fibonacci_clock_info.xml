@@ -2,10 +2,10 @@
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/app_widget_description"
-    android:initialKeyguardLayout="@layout/binary_clock"
-    android:initialLayout="@layout/binary_clock"
-    android:minWidth="100dp"
-    android:minHeight="80dp"
+    android:initialKeyguardLayout="@layout/fibonacci_clock"
+    android:initialLayout="@layout/fibonacci_clock"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />

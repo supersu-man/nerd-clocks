@@ -147,13 +147,12 @@
         android:layout_alignStart="@id/a4"
         android:gravity="center"
         android:layout_alignEnd="@id/d4"
-        android:id="@+id/appwidget_text"
-
+        android:id="@+id/binaryTimeText"
         android:layout_below="@id/d4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:text="Time"
+        android:text="Time!"
         >
 
     </TextView>
