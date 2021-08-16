@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:description="@string/app_widget_description"
+    android:description="@string/fibonacci"
     android:initialKeyguardLayout="@layout/fibonacci_clock"
     android:initialLayout="@layout/fibonacci_clock"
     android:minWidth="250dp"

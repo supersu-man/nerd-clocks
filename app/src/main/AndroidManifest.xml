@@ -10,10 +10,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NerdClocks">
+
+        <receiver
+            android:name=".BinaryAnalogueClock"
+            android:exported="true"
+            android:label="Binary Analogue Clock"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/binary_analogue_clock_info" />
+        </receiver>
+
         <receiver
             android:name=".FibonacciClock"
-            android:label="Fibonacci Clock"
-            android:exported="true">
+            android:exported="true"
+            android:label="Fibonacci Clock">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -22,13 +36,15 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/fibonacci_clock_info" />
         </receiver>
+
         <receiver
             android:name=".BinaryClock"
-            android:label="Binary Clock"
-            android:exported="true">
+            android:exported="true"
+            android:label="Binary Clock">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/binary_clock_info" />

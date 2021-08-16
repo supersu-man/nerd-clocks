@@ -28,7 +28,7 @@ class BinaryClock : AppWidgetProvider() {
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
-        println("Fibonacci Disabled")
+        println("Binary Disabled")
         removeAlarm(context, action)
     }
 }
