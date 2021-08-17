@@ -5,6 +5,7 @@
       <map>
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/drawable-v21/app_widget_background.xml" value="0.28854166666666664" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/drawable-v21/app_widget_inner_view_background.xml" value="0.28854166666666664" />
+        <entry key="..\:/Projects/NerdClocks/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.24739583333333334" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/drawable/card.xml" value="0.36302083333333335" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/drawable/card_small.xml" value="0.2234375" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/drawable/ic_outline_brightness_1_24.xml" value="0.20625" />
@@ -12,6 +13,7 @@
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/layout/binary_analogue_clock.xml" value="0.23333333333333334" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/layout/binary_clock.xml" value="0.27807971014492755" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/layout/fibonacci_clock.xml" value="0.33" />
+        <entry key="..\:/Projects/NerdClocks/app/src/main/res/layout/fibonacci_spiral_clock.xml" value="0.23125" />
         <entry key="..\:/Projects/NerdClocks/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.20625" />
       </map>
     </option>

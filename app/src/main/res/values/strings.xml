@@ -2,5 +2,6 @@
     <string name="app_name">Nerd Clocks</string>
     <string name="binaryanalogue">Analogue Clock with binary digits</string>
     <string name="binarymatrix">Binary Clock with a matrix</string>
-    <string name="fibonacci">Fibonacci Clock using 5:3:2:1:1 colored squares</string>
+    <string name="fibonaccisquares">Fibonacci Clock using 5:3:2:1:1 colored squares</string>
+    <string name="fibonaccispiral">Fibonacci Clock in spiral analogue form</string>
 </resources>

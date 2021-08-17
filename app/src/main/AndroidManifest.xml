@@ -11,21 +11,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NerdClocks">
 
-        <receiver
-            android:name=".BinaryAnalogueClock"
-            android:exported="true"
-            android:label="Binary Analogue Clock"
-            >
+        <receiver android:name=".FibonacciSpiralClock"
+            android:label="Fibonacci Spiral Clock"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/fibonacci_spiral_clock_info" />
+        </receiver>
+
+        <receiver android:name=".BinaryAnalogueClock"
+            android:exported="true"
+            android:label="Binary Analogue Clock">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/binary_analogue_clock_info" />
         </receiver>
 
-        <receiver
-            android:name=".FibonacciClock"
+        <receiver android:name=".FibonacciClock"
             android:exported="true"
             android:label="Fibonacci Clock">
             <intent-filter>
@@ -37,8 +47,7 @@
                 android:resource="@xml/fibonacci_clock_info" />
         </receiver>
 
-        <receiver
-            android:name=".BinaryClock"
+        <receiver android:name=".BinaryClock"
             android:exported="true"
             android:label="Binary Clock">
             <intent-filter>
@@ -53,12 +62,12 @@
         <service
             android:name=".UpdateWidgetService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <service
             android:name=".UpdateFibonacciWidgetService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver
-            android:name=".Receiver"
+        <receiver android:name=".Receiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_TICK" />
@@ -73,6 +82,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
