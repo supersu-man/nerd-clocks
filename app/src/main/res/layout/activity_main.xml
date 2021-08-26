@@ -8,13 +8,14 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:layout_margin="20dp"
         android:id="@+id/textMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_centerHorizontal="true"
-        android:textSize="18sp"
+        android:gravity="center"
         android:text="Disable battery optimization for this app so the widgets never stop updating."
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -28,12 +29,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <TextView
+        android:layout_margin="20dp"
+        android:id="@+id/textv1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/buttonMain"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:text="Click this button, select 'All apps', search for 'Nerd Clocks' and disable the battery optimisation."
+        />
+    <TextView
+        android:layout_margin="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textv1"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="And then add the widgets from your home screen just like any other widgets."
         />
 
 </RelativeLayout>
