@@ -1,26 +1,26 @@
-<RelativeLayout
-    android:id="@+id/rootLayout"
+<RelativeLayout android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@drawable/card"
     android:gravity="center"
-    android:layout_centerInParent="true">
+    android:backgroundTint="@color/AlmostBlack"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <ImageView
         android:layout_margin="2dp"
         android:layout_below="@id/b2"
         android:id="@+id/a3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:background="@drawable/ic_outline_brightness_1_24">
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
+        app:tint="@color/white"
+        android:src="@drawable/ic_outline_brightness_1_24">
     </ImageView>
     <ImageView
         android:layout_margin="2dp"
         android:id="@+id/a4"
         android:layout_below="@id/a3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -29,8 +29,8 @@
         android:layout_margin="2dp"
         android:id="@+id/b1"
         android:layout_toEndOf="@id/a3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:background="@drawable/ic_outline_brightness_1_24"
         android:backgroundTint="@color/white">
     </ImageView>
@@ -39,8 +39,8 @@
         android:id="@+id/b2"
         android:layout_toEndOf="@id/a3"
         android:layout_below="@id/b1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -49,8 +49,8 @@
         android:id="@+id/b3"
         android:layout_toEndOf="@id/a3"
         android:layout_below="@id/b2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -59,8 +59,8 @@
         android:id="@+id/b4"
         android:layout_toEndOf="@id/a4"
         android:layout_below="@id/b3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -68,8 +68,8 @@
         android:layout_margin="2dp"
         android:id="@+id/c1"
         android:layout_toEndOf="@id/b1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -78,8 +78,8 @@
         android:id="@+id/c2"
         android:layout_toEndOf="@id/b2"
         android:layout_below="@id/c1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -88,18 +88,18 @@
         android:id="@+id/c3"
         android:layout_toEndOf="@id/b3"
         android:layout_below="@id/c2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
     <ImageView
         android:layout_margin="2dp"
         android:layout_toEndOf="@id/b4"
-        android:id="@+id/c4"
         android:layout_below="@id/c3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/c4"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -107,8 +107,8 @@
         android:layout_margin="2dp"
         android:id="@+id/d1"
         android:layout_toEndOf="@id/c1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -117,8 +117,8 @@
         android:id="@+id/d2"
         android:layout_toEndOf="@id/c2"
         android:layout_below="@id/d1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -127,8 +127,8 @@
         android:id="@+id/d3"
         android:layout_toEndOf="@id/c3"
         android:layout_below="@id/d2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -137,8 +137,8 @@
         android:id="@+id/d4"
         android:layout_toEndOf="@id/c4"
         android:layout_below="@id/d3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:backgroundTint="@color/white"
         android:background="@drawable/ic_outline_brightness_1_24">
     </ImageView>
@@ -149,8 +149,8 @@
         android:layout_alignEnd="@id/d4"
         android:id="@+id/binaryTimeText"
         android:layout_below="@id/d4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/binary_size"
+        android:layout_height="@dimen/binary_size"
         android:textColor="@color/white"
         android:text="Time!"
         >

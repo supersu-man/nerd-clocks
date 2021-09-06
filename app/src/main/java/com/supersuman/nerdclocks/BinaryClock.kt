@@ -44,12 +44,11 @@ private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager
     if (hour==0) hour=12
     val minute = cal.get(Calendar.MINUTE)
     views.setTextViewText(R.id.binaryTimeText, "$hour : $minute")
-
     clearImages(views)
-    setImage(views, 1, hour%10)
     setImage(views, 0, hour/10)
-    setImage(views, 3, minute%10)
+    setImage(views, 1, hour%10)
     setImage(views, 2, minute/10)
+    setImage(views, 3, minute%10)
 
     appWidgetManager.updateAppWidget(appWidgetId, views)
 }
