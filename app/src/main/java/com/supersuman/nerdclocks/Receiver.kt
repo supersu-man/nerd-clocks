@@ -10,9 +10,9 @@ import java.util.*
 
 class Receiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent!!.action == "FALUDA")
+        if (intent?.action == "FALUDA")
             JobIntentService.enqueueWork(context!!, UpdateWidgetService::class.java, 1000, intent)
-        if (intent.action == "RASGULA")
+        if (intent?.action == "RASGULA")
             JobIntentService.enqueueWork(context!!, UpdateFibonacciWidgetService::class.java, 999, intent)
     }
 }
