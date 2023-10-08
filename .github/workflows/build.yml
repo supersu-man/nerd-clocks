@@ -1,0 +1,92 @@
+name: Build
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-ecosystem/action-regex-match@v2.0.2
+        id: regex-match
+        with:
+          text: ${{ github.event.head_commit.message }}
+          regex: '^v[0-9]+\.[0-9]+\.[0-9]+$'
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Build APK
+        id: build
+        run: bash ./gradlew assembleRelease
+
+      - name: Sign APK
+        id: sign_apk
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTOREPASSWORD }}
+          keyPassword: ${{ secrets.KEYPASSWORD }}
+
+      - name: Build AAB
+        run: bash ./gradlew bundleRelease
+
+      - name: Sign AAB
+        id: sign_aab
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTOREPASSWORD }}
+          keyPassword: ${{ secrets.KEYPASSWORD }}
+
+      - name: Build Changelog
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        id: changelog
+        uses: ardalanamini/auto-changelog@v3
+        with:
+          mention-authors: false
+          mention-new-contributors: false
+          include-compare: false
+          semver: false
+
+      - name: Create Release
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          body: ${{ steps.changelog.outputs.changelog }}
+          tag: ${{ github.event.head_commit.message }}
+          name: Release ${{ github.event.head_commit.message }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          asset_name: app-release-signed-${{ github.event.head_commit.message }}.apk
+          asset_content_type: application/zip
+
+      - name: Upload AAB
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{steps.sign_aab.outputs.signedReleaseFile}}
+          asset_name: app-release-signed-${{ github.event.head_commit.message }}.aab
+          asset_content_type: application/zip

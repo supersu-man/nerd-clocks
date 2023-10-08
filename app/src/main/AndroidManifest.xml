@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:allowBackup="true"
         android:fullBackupOnly="true"
@@ -9,45 +11,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NerdClocks">
-
-        <receiver android:name=".FibonacciSpiralClock"
+        <receiver
+            android:name=".FibonacciSpiralClock"
             android:label="Fibonacci Spiral Clock"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/fibonacci_spiral_clock_info" />
+                android:resource="@xml/my_app_widget_info" />
         </receiver>
-
-        <receiver android:name=".BinaryAnalogueClock"
-            android:exported="true"
-            android:label="Binary Analogue Clock">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/binary_analogue_clock_info" />
-        </receiver>
-
-        <receiver android:name=".FibonacciClock"
-            android:exported="true"
-            android:label="Fibonacci Clock">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/fibonacci_clock_info" />
-        </receiver>
-
-        <receiver android:name=".BinaryClock"
-            android:exported="true"
+        <receiver android:name=".WidgetBroadcastReceiver" />
+        <receiver
+            android:name=".BinaryClockReceiver"
+            android:exported="false"
             android:label="Binary Clock">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -55,22 +34,19 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/binary_clock_info" />
+                android:resource="@xml/my_app_widget_info" />
         </receiver>
-
-        <service
-            android:name=".UpdateWidgetService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service
-            android:name=".UpdateFibonacciWidgetService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <receiver android:name=".Receiver"
-            android:exported="true">
+        <receiver
+            android:name=".FibonacciClockReceiver"
+            android:exported="false"
+            android:label="Fibonacci Clock">
             <intent-filter>
-                <action android:name="android.intent.action.TIME_TICK" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/my_app_widget_info" />
         </receiver>
 
         <activity
@@ -78,10 +54,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

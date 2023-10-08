@@ -1,147 +1,145 @@
 package com.supersuman.nerdclocks
 
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.widget.RemoteViews
-import androidx.core.app.JobIntentService
-import androidx.core.content.ContextCompat
-import java.util.*
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
+import android.os.Build
+import androidx.annotation.ColorInt
+import androidx.annotation.FloatRange
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.toBitmap
+import androidx.glance.BitmapImageProvider
+import androidx.glance.GlanceId
+import androidx.glance.GlanceModifier
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.provideContent
+import androidx.glance.background
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.padding
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
+import com.supersuman.nerdclocks.ui.theme.my_blue
+import com.supersuman.nerdclocks.ui.theme.my_green
+import com.supersuman.nerdclocks.ui.theme.my_red
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import kotlin.random.Random
 
 
-class FibonacciClock : AppWidgetProvider() {
-
-    val action = "RASGULA"
-
-    override fun onUpdate(
-        context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
-        }
-    }
-
-    override fun onEnabled(context: Context) {
+class FibonacciClockReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = FibonacciClock()
+    override fun onEnabled(context: Context?) {
         super.onEnabled(context)
-        println("Fibonacci Enabled")
-        setAlarmNextMinute(context, Calendar.getInstance(),action)
+        println("setting alarm")
+        cancelAlarmManager(context)
+        setAlarmManager(context)
     }
 
-    override fun onDisabled(context: Context) {
+    override fun onDisabled(context: Context?) {
         super.onDisabled(context)
-        println("Fibonacci Disabled")
-        removeAlarm(context, action)
+        println("cancelling alarm")
+        cancelAlarmManager(context)
     }
 }
 
-private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-    removeAlarm(context,"RASGULA")
-    setAlarmNextMinute(context, Calendar.getInstance(),"RASGULA")
-    val views = RemoteViews(context.packageName, R.layout.fibonacci_clock)
-    clearViews(context,views)
-    var hour = Calendar.getInstance().get(Calendar.HOUR)
-    if (hour==0) hour=12
-    val minute = Calendar.getInstance().get(Calendar.MINUTE)
-    views.setTextViewText(R.id.fibnoacciTimeText,"$hour : $minute")
-    val mapBoxes = mapOf(1 to listOf(R.id.one1,R.id.one2), 2 to listOf(R.id.two), 3 to listOf(R.id.three), 5 to listOf(R.id.five))
-    val mapColors = mapOf(
-        "r" to ContextCompat.getColor(context, R.color.widgetRed),
-        "g" to ContextCompat.getColor(context, R.color.widgetGreen),
-        "b" to ContextCompat.getColor(context, R.color.widgetBlue)
-    )
-    val rgb = rgb(hour,minute/5)
-    var firstOne = true
-    val random = mutableListOf(0,1)
-    for(i in rgb.keys) {
-        for (j in rgb[i]!!){
-            if (j==1){
-                if (firstOne){
-                    val pos = random.random()
-                    views.setInt(mapBoxes[j]!![pos],"setColorFilter", mapColors[i]!!)
-                    random.remove(pos)
-                    firstOne=false
-                }else{
-                    views.setInt(mapBoxes[j]!![random.random()],"setColorFilter", mapColors[i]!!)
-                }
-            }else{
-                views.setInt(mapBoxes[j]!![0],"setColorFilter", mapColors[i]!!)
+class FibonacciClock : GlanceAppWidget() {
+
+
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val sdf = SimpleDateFormat("hh:mm")
+        val currentDate = sdf.format(Date())
+        println("updating widget at $currentDate")
+
+        val colors = mutableMapOf<Number, Color>(
+            1.1 to Color.LightGray,
+            1.2 to Color.LightGray,
+            2 to Color.LightGray,
+            3 to Color.LightGray,
+            5 to Color.LightGray
+        )
+        val hour = Calendar.getInstance().get(Calendar.HOUR)
+        val minute = Calendar.getInstance().get(Calendar.MINUTE)
+        val hourList = partitions(hour)[Random.nextInt(0, partitions(hour).size)]
+        val minuteList = partitions(minute/5)[Random.nextInt(0, partitions(minute/5).size)]
+        colors.keys.forEach {
+            if(hourList.contains(it) && minuteList.contains(it)) {
+                colors[it] = my_blue
+            } else if (hourList.contains(it)) {
+                colors[it] = my_red
+            } else if (minuteList.contains(it)) {
+                colors[it] = my_green
             }
         }
-    }
-    appWidgetManager.updateAppWidget(appWidgetId, views)
-}
-
-private fun clearViews(context: Context, views: RemoteViews) {
-    views.setInt(R.id.one1,"setColorFilter", ContextCompat.getColor(context, R.color.Grey))
-    views.setInt(R.id.one2,"setColorFilter", ContextCompat.getColor(context, R.color.Grey))
-    views.setInt(R.id.two,"setColorFilter", ContextCompat.getColor(context, R.color.Grey))
-    views.setInt(R.id.three,"setColorFilter", ContextCompat.getColor(context, R.color.Grey))
-    views.setInt(R.id.five,"setColorFilter", ContextCompat.getColor(context, R.color.Grey))
-}
-
-private fun rgb(hour : Int, minute : Int): Map<String, MutableList<Int>> {
-    val map : Map<String, MutableList<Int>> = mapOf("r" to mutableListOf(),"g" to mutableListOf(),"b" to mutableListOf())
-    val h = filterPartitions(hour).random()
-    val m = filterPartitions(minute).random()
-    val hm = HashSet(h.plus(m))
-    if (h.count { it==1 }==2 && m.count { it==1 }==2){
-        map["b"]?.add(1)
-    }else if (h.count { it==1 }==2){
-        map["r"]?.add(1)
-    }else if (m.count { it==1 }==2){
-        map["g"]?.add(1)
-    }
-    for (i in hm){
-        if (i==0) continue
-        if (i in m && i in h ){
-            map["b"]?.add(i)
-        }else if (i in h && !m.contains(i)){
-            map["r"]?.add(i)
-        }else if (i in m && !h.contains(i)){
-            map["g"]?.add(i)
+        provideContent {
+            Widget(colors, currentDate)
         }
     }
-    return map
-}
 
-private fun filterPartitions(num : Int): MutableList<MutableList<Int>> {
-    val arr = partition(num)
-    val v = mutableListOf<MutableList<Int>>()
-    for (i in arr){
-        if (i.count { it==1 }<=2 && i.count { it==2 }<=1 &&
-            i.count { it==3 }<=1 && i.count { it==5 }<=1 &&
-            !i.contains(4) && !i.contains(6) && !i.contains(7) &&
-            !i.contains(8) && !i.contains(9) && !i.contains(10) &&
-            !i.contains(11) && !i.contains(12))
-        {
-            v.add(i)
+    private fun partitions(integer: Int): List<List<Number>>{
+        return when(integer) {
+            12 -> listOf(listOf(5,3,2,1.1,1.2))
+            11 -> listOf(listOf(5,3,2,1.1), listOf(5,3,2,1.2))
+            10 -> listOf(listOf(5,3,2), listOf(5,3,1.1,1.2))
+            9 -> listOf(listOf(5,3,1.1), listOf(5,3,1.2), listOf(5,2,1.1,1.2))
+            8 -> listOf(listOf(5,3), listOf(5,2,1.1), listOf(5,2,1.2))
+            7 -> listOf(listOf(5,2), listOf(5,1.1,1.2), listOf(3,2,1.1,1.2))
+            6 -> listOf(listOf(5,1.1), listOf(5,1.2), listOf(3,2,1.1), listOf(3,2,1.2))
+            5 -> listOf(listOf(5), listOf(3,2), listOf(3, 1.1, 1.2))
+            4 -> listOf(listOf(3, 1.1), listOf(3, 1.2), listOf(2, 1.1, 1.2))
+            3 -> listOf(listOf(3), listOf(2, 1.1), listOf(2, 1.2))
+            2 -> listOf(listOf(2), listOf(1.1, 1.2))
+            1 -> listOf(listOf(1.1), listOf(1.2))
+            else -> listOf()
         }
     }
-    return v
-}
 
-private fun partition(num: Int): MutableSet<MutableList<Int>> {
-    val partitions = mutableSetOf<MutableList<Int>>()
-    partitions.add(mutableListOf(num))
-    for(i in 1 until num){
-        for (j in partition(num-i)){
-            j.add(i)
-            j.sort()
-            partitions.add(j)
+    @Composable
+    fun Widget(colors: Map<Number, Color>, currentDate: String) {
+        Row (modifier = GlanceModifier.fillMaxSize().padding(bottom = 20.dp)){
+            Column (modifier = GlanceModifier.fillMaxHeight().defaultWeight()) {
+                Row (modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
+                    Column (modifier = GlanceModifier.cornerRadiusCompat(15, colors[2].hashCode()).fillMaxHeight().defaultWeight()) {}
+                    Column (modifier = GlanceModifier.fillMaxHeight().defaultWeight()) {
+                        Row (modifier = GlanceModifier.cornerRadiusCompat(15, colors[1.1].hashCode()).fillMaxWidth().defaultWeight()) {}
+                        Row (modifier = GlanceModifier.cornerRadiusCompat(15, colors[1.2].hashCode()).fillMaxWidth().defaultWeight()) {}
+                    }
+                }
+                Row (modifier = GlanceModifier.cornerRadiusCompat(15, colors[3].hashCode()).fillMaxWidth().defaultWeight()){}
+            }
+            Column (modifier = GlanceModifier.cornerRadiusCompat(15, colors[5].hashCode()).fillMaxHeight().defaultWeight()){}
+        }
+        Row (modifier = GlanceModifier.fillMaxSize(), verticalAlignment = Alignment.Vertical.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(currentDate, style = TextStyle(color = ColorProvider(Color.White)))
         }
     }
-    return partitions
-}
 
-
-class UpdateFibonacciWidgetService : JobIntentService() {
-    override fun onHandleWork(intent: Intent) {
-        val manager = AppWidgetManager.getInstance(this)
-        val ids = manager.getAppWidgetIds(ComponentName(application, FibonacciClock::class.java))
-        println("Updating from Fibonacci service")
-        for (id in ids) {
-            updateAppWidget(applicationContext, manager, id)
+    private fun GlanceModifier.cornerRadiusCompat(
+        cornerRadius: Int,
+        @ColorInt color: Int,
+        @FloatRange(from = 0.0, to = 1.0) backgroundAlpha: Float = 1f,
+    ): GlanceModifier {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            this.background(Color(color).copy(alpha = backgroundAlpha))
+                .cornerRadius(cornerRadius.dp)
+        } else {
+            val radii = FloatArray(8) { cornerRadius.toFloat() }
+            val shape = ShapeDrawable(RoundRectShape(radii, null, null))
+            shape.paint.color = ColorUtils.setAlphaComponent(color, (255 * backgroundAlpha).toInt())
+            val bitmap = shape.toBitmap(width = 150, height = 75)
+            this.background(BitmapImageProvider(bitmap))
         }
     }
+
 }

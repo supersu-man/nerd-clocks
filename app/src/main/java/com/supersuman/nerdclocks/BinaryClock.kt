@@ -1,117 +1,127 @@
 package com.supersuman.nerdclocks
 
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.widget.RemoteViews
-import androidx.core.app.JobIntentService
-import java.util.*
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
+import android.os.Build
+import androidx.annotation.ColorInt
+import androidx.annotation.FloatRange
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.toBitmap
+import androidx.glance.BitmapImageProvider
+import androidx.glance.GlanceId
+import androidx.glance.GlanceModifier
+import androidx.glance.ImageProvider
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.provideContent
+import androidx.glance.background
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.padding
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
+import com.supersuman.nerdclocks.ui.theme.almost_black
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
-class BinaryClock : AppWidgetProvider() {
-
-    val action = "FALUDA"
-
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
-        }
-    }
-
+class BinaryClockReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = BinaryClock()
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
-        println("Binary Enabled")
-        setAlarmNextMinute(context, Calendar.getInstance(), action)
+        println("setting alarm")
+        cancelAlarmManager(context)
+        setAlarmManager(context)
     }
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
-        println("Binary Disabled")
-        removeAlarm(context, action)
+        println("cancelling alarm")
+        cancelAlarmManager(context)
     }
 }
 
+class BinaryClock : GlanceAppWidget() {
 
-
-private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-    removeAlarm(context,"FALUDA")
-    setAlarmNextMinute(context, Calendar.getInstance(),"FALUDA")
-    val views = RemoteViews(context.packageName, R.layout.binary_clock)
-    val cal = Calendar.getInstance()
-    var hour = cal.get(Calendar.HOUR)
-    if (hour==0) hour=12
-    val minute = cal.get(Calendar.MINUTE)
-    views.setTextViewText(R.id.binaryTimeText, "$hour : $minute")
-    clearImages(views)
-    setImage(views, 0, hour/10)
-    setImage(views, 1, hour%10)
-    setImage(views, 2, minute/10)
-    setImage(views, 3, minute%10)
-
-    appWidgetManager.updateAppWidget(appWidgetId, views)
-}
-
-private val map = mapOf(
-    0 to listOf(0, 0, R.id.a3, R.id.a4),
-    1 to listOf(R.id.b1, R.id.b2, R.id.b3, R.id.b4),
-    2 to listOf(R.id.c1, R.id.c2, R.id.c3, R.id.c4),
-    3 to listOf(R.id.d1, R.id.d2, R.id.d3, R.id.d4)
-)
-
-private fun clearImages(views: RemoteViews){
-    for(i in map.values){
-        for (j in i){
-            if (j!=0){
-                views.setImageViewResource(j, R.drawable.ic_outline_brightness_1_24)
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val sdf = SimpleDateFormat("hh:mm")
+        val currentDate = sdf.format(Date())
+        println("updating widget at $currentDate")
+        provideContent {
+            Column(
+                modifier = GlanceModifier
+                    .padding(5.dp)
+                    .fillMaxSize()
+                    .cornerRadiusCompat(15, almost_black.hashCode()),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row {
+                    myColumn(currentDate, 0)
+                    myColumn(currentDate, 1)
+                    myColumn(currentDate, 3)
+                    myColumn(currentDate, 4)
+                }
+                Row {
+                    Text(currentDate, style = TextStyle(color = ColorProvider(Color.White)))
+                }
             }
         }
     }
-}
 
-private fun setImage(views: RemoteViews,column : Int, digit:Int){
-    when(digit){
-        1 -> views.setImageViewResource(map[column]!![3], R.drawable.ic_baseline_brightness_1_24)
-        2 -> views.setImageViewResource(map[column]!![2], R.drawable.ic_baseline_brightness_1_24)
-        3 ->{
-            views.setImageViewResource(map[column]!![3], R.drawable.ic_baseline_brightness_1_24)
-            views.setImageViewResource(map[column]!![2], R.drawable.ic_baseline_brightness_1_24)
-        }
-        4 ->{
-            views.setImageViewResource(map[column]!![1], R.drawable.ic_baseline_brightness_1_24)
-        }
-        5 ->{
-            views.setImageViewResource(map[column]!![1], R.drawable.ic_baseline_brightness_1_24)
-            views.setImageViewResource(map[column]!![3], R.drawable.ic_baseline_brightness_1_24)
-        }
-        6 ->{
-            views.setImageViewResource(map[column]!![1], R.drawable.ic_baseline_brightness_1_24)
-            views.setImageViewResource(map[column]!![2], R.drawable.ic_baseline_brightness_1_24)
-        }
-        7 ->{
-            views.setImageViewResource(map[column]!![1], R.drawable.ic_baseline_brightness_1_24)
-            views.setImageViewResource(map[column]!![2], R.drawable.ic_baseline_brightness_1_24)
-            views.setImageViewResource(map[column]!![3], R.drawable.ic_baseline_brightness_1_24)
-        }
-        8 ->{
-            views.setImageViewResource(map[column]!![0], R.drawable.ic_baseline_brightness_1_24)
-        }
-        9 ->{
-            views.setImageViewResource(map[column]!![0], R.drawable.ic_baseline_brightness_1_24)
-            views.setImageViewResource(map[column]!![3], R.drawable.ic_baseline_brightness_1_24)
+    @Composable
+    private fun myColumn(currentDate: String, col: Int) {
+        Column {
+            Row {
+                Column(modifier = GlanceModifier.then(
+                    if (currentDate[col] in arrayOf('8', '9')) GlanceModifier.background(ImageProvider(R.drawable.ic_baseline_brightness_1_24))
+                    else GlanceModifier.background(ImageProvider(R.drawable.ic_outline_brightness_1_24))
+                )) {}
+            }
+            Row {
+                Column(modifier = GlanceModifier.then(
+                    if (currentDate[col] in arrayOf('4', '5', '6', '7')) GlanceModifier.background(ImageProvider(R.drawable.ic_baseline_brightness_1_24))
+                    else GlanceModifier.background(ImageProvider(R.drawable.ic_outline_brightness_1_24))
+                )) {}
+            }
+            Row {
+                Column(modifier = GlanceModifier.then(
+                    if (currentDate[col] in arrayOf('2', '3', '6', '7')) GlanceModifier.background(ImageProvider(R.drawable.ic_baseline_brightness_1_24))
+                    else GlanceModifier.background(ImageProvider(R.drawable.ic_outline_brightness_1_24))
+                )) {}
+            }
+            Row {
+                Column(modifier = GlanceModifier.then(
+                    if (currentDate[col] in arrayOf('1', '3', '5', '7', '9')) GlanceModifier.background(ImageProvider(R.drawable.ic_baseline_brightness_1_24))
+                    else GlanceModifier.background(ImageProvider(R.drawable.ic_outline_brightness_1_24))
+                )) {}
+            }
         }
     }
-}
 
-
-class UpdateWidgetService : JobIntentService() {
-    override fun onHandleWork(intent: Intent) {
-        val manager = AppWidgetManager.getInstance(this)
-        val ids = manager.getAppWidgetIds(ComponentName(application, BinaryClock::class.java))
-        println("Updating from Binary service")
-        for (id in ids) {
-            updateAppWidget(applicationContext, manager, id)
+    private fun GlanceModifier.cornerRadiusCompat(
+        cornerRadius: Int,
+        @ColorInt color: Int,
+        @FloatRange(from = 0.0, to = 1.0) backgroundAlpha: Float = 1f,
+    ): GlanceModifier {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            this.background(Color(color).copy(alpha = backgroundAlpha))
+                .cornerRadius(cornerRadius.dp)
+        } else {
+            val radii = FloatArray(8) { cornerRadius.toFloat() }
+            val shape = ShapeDrawable(RoundRectShape(radii, null, null))
+            shape.paint.color = ColorUtils.setAlphaComponent(color, (255 * backgroundAlpha).toInt())
+            val bitmap = shape.toBitmap(width = 150, height = 75)
+            this.background(BitmapImageProvider(bitmap))
         }
     }
+
 }

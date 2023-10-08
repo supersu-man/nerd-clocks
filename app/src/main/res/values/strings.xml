@@ -4,4 +4,7 @@
     <string name="binarymatrix">Binary Clock with a matrix</string>
     <string name="fibonaccisquares">Fibonacci Clock using 5:3:2:1:1 colored squares</string>
     <string name="fibonaccispiral">Fibonacci Clock in spiral analogue form</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
 </resources>
