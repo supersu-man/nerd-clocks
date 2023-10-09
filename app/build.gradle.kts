@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.supersumann.nerdclocks"
+        applicationId = "com.supersuman.nerdclocks"
         minSdk = 21
         targetSdk = 34
         versionCode = 4
