@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 Surface {
-                    val pagerState = rememberPagerState()
+                    val pagerState = rememberPagerState(0, 0F) { 3 }
                     Column {
                         TabLayout(pagerState)
                         PagerLayout(pagerState)
@@ -93,7 +93,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun PagerLayout(pagerState: PagerState) {
         HorizontalPager(
-            pageCount = pages.size,
             state = pagerState,
             pageSpacing = 0.dp,
             modifier = Modifier.fillMaxSize()
