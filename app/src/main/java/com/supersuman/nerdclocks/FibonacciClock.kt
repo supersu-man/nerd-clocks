@@ -38,17 +38,19 @@ import java.util.Date
 import kotlin.random.Random
 
 
-class FibonacciClockReceiver : GlanceAppWidgetReceiver() {
+class FibonacciClockReceiverr : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = FibonacciClock()
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
         println("setting alarm")
+        context?.let { enableWidget(it) }
         cancelAlarmManager(context)
         setAlarmManager(context)
     }
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
+        context?.let { disableWidget(it) }
         println("cancelling alarm")
         cancelAlarmManager(context)
     }

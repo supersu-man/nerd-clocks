@@ -1,6 +1,13 @@
 package com.supersuman.nerdclocks
 
+import android.app.AlarmManager
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -31,6 +38,9 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,25 +50,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.getSystemService
 import androidx.glance.appwidget.updateAll
-import com.supersuman.nerdclocks.databinding.FibonacciSpiralClockBinding
 import com.supersuman.nerdclocks.ui.theme.AppTheme
 import com.supersuman.nerdclocks.ui.theme.my_blue
 import com.supersuman.nerdclocks.ui.theme.my_green
 import com.supersuman.nerdclocks.ui.theme.my_red
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val pages = listOf(
-        "Home",
-        "Binary",
-        "Fibonacci"
-    )
+    private val pages = listOf("Home", "Binary", "Fibonacci")
+    private lateinit var alarmManager: AlarmManager
+    private lateinit var isPerms: MutableState<Boolean>
 
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        alarmManager = getSystemService<AlarmManager>()!!
+
         setContent {
+            isPerms = remember { mutableStateOf(isPermissionGranted()) }
             AppTheme {
                 Surface {
                     val pagerState = rememberPagerState(0, 0F) { 3 }
@@ -71,6 +85,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (this::isPerms.isInitialized)
+            isPerms.value = isPermissionGranted()
+        updateAndEnableAlarm(CoroutineScope(Dispatchers.Main))
+    }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
@@ -105,26 +125,56 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Preview(showBackground = true)
     @Composable
     fun Home() {
+        isPerms = remember { mutableStateOf(isPermissionGranted()) }
         val coroutineScope = rememberCoroutineScope()
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("Thanks for using the app", modifier = Modifier.padding(10.dp))
+            Text("Widget not updating every minute? Try removing all the Nerd Clock widgets and adding them back on screen or you may also use Sync time button", textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
             Button(onClick = {
-                coroutineScope.launch {
-                    BinaryClockReceiver().glanceAppWidget.updateAll(this@MainActivity)
-                    FibonacciClockReceiver().glanceAppWidget.updateAll(this@MainActivity)
-                }
+                updateAndEnableAlarm(coroutineScope)
             }) {
                 Text("Sync time")
+            }
+            Text("Thanks for using the app", modifier = Modifier.padding(10.dp))
+            if (!isPerms.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Button(onClick = {
+                    val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    intent.setData(Uri.parse("package:$packageName"))
+                    startActivity(intent)
+                }) {
+                    Text("Grant permission")
+                }
             }
         }
     }
 
-    @Preview(showBackground = true)
+    private fun updateAndEnableAlarm(coroutineScope: CoroutineScope) = coroutineScope.launch {
+        val sharedPref = getSharedPreferences(packageName, Context.MODE_PRIVATE)
+        val n = sharedPref.getInt("widgets", 0)
+        if (n>0 && isPermissionGranted()) {
+            cancelAlarmManager(this@MainActivity)
+            setAlarmManager(this@MainActivity)
+            BinaryClockReceiverr().glanceAppWidget.updateAll(this@MainActivity)
+            FibonacciClockReceiverr().glanceAppWidget.updateAll(this@MainActivity)
+        }
+    }
+
+    private fun isPermissionGranted(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+    }
+
     @Composable
     fun BinaryClockInfo() {
-        Column(modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+            .verticalScroll(rememberScrollState())) {
             Text("Binary Clock", modifier = Modifier.padding(0.dp, 20.dp), fontSize = 30.sp)
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.Center) {
@@ -187,7 +237,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            Text("Time = 12:59", modifier = Modifier.padding(10.dp).fillMaxWidth(), textAlign = TextAlign.Center)
+            Text("Time = 12:59", modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(), textAlign = TextAlign.Center)
             Text("Each horizontal row has a value. From bottom, first row has 1 (2^0), second has 2 (2^1), third has 4 (2^2), fourth has 8 (2^3).", modifier = Modifier.padding(0.dp, 10.dp))
             Text("To get value of a vertical column, add all the lighted circle values. For the above example: value of first column is 1, value of second column is 2, third column is 5 (both 1 and 4 are lighted), fourth column is 9 (both 8 and 1 are lighted)", modifier = Modifier.padding(0.dp, 10.dp))
         }
@@ -195,29 +247,72 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun FibonacciClockInfo() {
-        Column(Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState())) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(10.dp)
+                .verticalScroll(rememberScrollState())) {
             Text("Fibonacci Clock", modifier = Modifier.padding(0.dp, 20.dp), fontSize = 30.sp)
             Row (Modifier.height(250.dp)) {
-                Column (Modifier.fillMaxHeight().weight(1f)) {
-                    Row (Modifier.fillMaxWidth().weight(1f)){
-                        Column(Modifier.fillMaxHeight().weight(1f).background(my_green)) {
-                            Text(text = "2", textAlign = TextAlign.Center, modifier = Modifier.fillMaxSize().wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
+                Column (
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(1f)) {
+                    Row (
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)){
+                        Column(
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1f)
+                                .background(my_green)) {
+                            Text(text = "2", textAlign = TextAlign.Center, modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
                         }
-                        Column(Modifier.fillMaxHeight().weight(1f)) {
-                            Row(Modifier.background(Color.LightGray).weight(1f).fillMaxWidth()) {
-                                Text(text = "1", textAlign = TextAlign.Center, modifier = Modifier.fillMaxSize().wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
+                        Column(
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(1f)) {
+                            Row(
+                                Modifier
+                                    .background(Color.LightGray)
+                                    .weight(1f)
+                                    .fillMaxWidth()) {
+                                Text(text = "1", textAlign = TextAlign.Center, modifier = Modifier
+                                    .fillMaxSize()
+                                    .wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
                             }
-                            Row(Modifier.background(my_red).weight(1f). fillMaxWidth()) {
-                                Text(text = "1", textAlign = TextAlign.Center, modifier = Modifier.fillMaxSize().wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
+                            Row(
+                                Modifier
+                                    .background(my_red)
+                                    .weight(1f)
+                                    .fillMaxWidth()) {
+                                Text(text = "1", textAlign = TextAlign.Center, modifier = Modifier
+                                    .fillMaxSize()
+                                    .wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
                             }
                         }
                     }
-                    Row (Modifier.background(my_blue).fillMaxWidth().weight(1f)) {
-                        Text(text = "3", textAlign = TextAlign.Center, modifier = Modifier.fillMaxSize().wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
+                    Row (
+                        Modifier
+                            .background(my_blue)
+                            .fillMaxWidth()
+                            .weight(1f)) {
+                        Text(text = "3", textAlign = TextAlign.Center, modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
                     }
                 }
-                Column (Modifier.background(my_red).fillMaxHeight().weight(1f)) {
-                    Text(text = "5", textAlign = TextAlign.Center, modifier = Modifier.fillMaxSize().wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
+                Column (
+                    Modifier
+                        .background(my_red)
+                        .fillMaxHeight()
+                        .weight(1f)) {
+                    Text(text = "5", textAlign = TextAlign.Center, modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentHeight(), fontSize = 24.sp, color = Color.Black)
                 }
             }
             Text("The Fibonacci sequence is the sequence beginning 1, 1 and where each number is the sum of the previous two. Its first five digits are: 1, 1, 2, 3, 5", modifier = Modifier.padding(0.dp, 10.dp))

@@ -33,23 +33,26 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 
-class BinaryClockReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget = BinaryClock()
+class BinaryClockReceiverr : GlanceAppWidgetReceiver() {
+
+    override val glanceAppWidget: GlanceAppWidget = BinaryClockk()
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
         println("setting alarm")
+        context?.let { enableWidget(it) }
         cancelAlarmManager(context)
         setAlarmManager(context)
     }
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
+        context?.let { disableWidget(it) }
         println("cancelling alarm")
         cancelAlarmManager(context)
     }
 }
 
-class BinaryClock : GlanceAppWidget() {
+class BinaryClockk : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val sdf = SimpleDateFormat("hh:mm")
@@ -65,10 +68,10 @@ class BinaryClock : GlanceAppWidget() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row {
-                    myColumn(currentDate, 0)
-                    myColumn(currentDate, 1)
-                    myColumn(currentDate, 3)
-                    myColumn(currentDate, 4)
+                    MyColumn(currentDate, 0)
+                    MyColumn(currentDate, 1)
+                    MyColumn(currentDate, 3)
+                    MyColumn(currentDate, 4)
                 }
                 Row {
                     Text(currentDate, style = TextStyle(color = ColorProvider(Color.White)))
@@ -78,7 +81,7 @@ class BinaryClock : GlanceAppWidget() {
     }
 
     @Composable
-    private fun myColumn(currentDate: String, col: Int) {
+    private fun MyColumn(currentDate: String, col: Int) {
         Column {
             Row {
                 Column(modifier = GlanceModifier.then(

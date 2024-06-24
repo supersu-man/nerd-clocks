@@ -19,8 +19,8 @@ class WidgetBroadcastReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         CoroutineScope(Dispatchers.Main).launch {
             context?.let {
-                BinaryClockReceiver().glanceAppWidget.updateAll(it)
-                FibonacciClockReceiver().glanceAppWidget.updateAll(it)
+                BinaryClockReceiverr().glanceAppWidget.updateAll(it)
+                FibonacciClockReceiverr().glanceAppWidget.updateAll(it)
                 println("force updating widgets")
             }
         }
@@ -48,4 +48,16 @@ fun cancelAlarmManager(context: Context?) {
     val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
     alarmManager?.cancel(pendingIntent)
     println("alarm cancelled")
+}
+
+fun enableWidget(context: Context) {
+    val sharedPref = context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
+    val n = sharedPref.getInt("widgets", 0)
+    sharedPref.edit().putInt("widgets", n+1).apply()
+}
+
+fun disableWidget(context: Context) {
+    val sharedPref = context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
+    val n = sharedPref.getInt("widgets", 1)
+    if(n>0) sharedPref.edit().putInt("widgets", n-1).apply()
 }
