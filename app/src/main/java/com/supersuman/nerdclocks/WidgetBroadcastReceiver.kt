@@ -61,3 +61,8 @@ fun disableWidget(context: Context) {
     val n = sharedPref.getInt("widgets", 1)
     if(n>0) sharedPref.edit().putInt("widgets", n-1).apply()
 }
+
+fun isShowTime(context: Context): Boolean {
+    val sharedPref = context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
+    return sharedPref.getBoolean("showTime", true)
+}

@@ -31,6 +31,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
     private val pages = listOf("Home", "Binary", "Fibonacci")
     private lateinit var alarmManager: AlarmManager
     private lateinit var isPerms: MutableState<Boolean>
+    private lateinit var showTime: MutableState<Boolean>
 
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +74,6 @@ class MainActivity : ComponentActivity() {
         alarmManager = getSystemService<AlarmManager>()!!
 
         setContent {
-            isPerms = remember { mutableStateOf(isPermissionGranted()) }
             AppTheme {
                 Surface {
                     val pagerState = rememberPagerState(0, 0F) { 3 }
@@ -129,15 +130,30 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun Home() {
         isPerms = remember { mutableStateOf(isPermissionGranted()) }
+        showTime = remember { mutableStateOf(isShowTime(this)) }
         val coroutineScope = rememberCoroutineScope()
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("Widget not updating every minute? Try removing all the Nerd Clock widgets and adding them back on screen or you may also use Sync time button", textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
-            Button(onClick = {
-                updateAndEnableAlarm(coroutineScope)
-            }) {
-                Text("Sync time")
+            Row {
+                Text("If the widget isn’t updating every minute, consider removing all Nerd Clock widgets from the screen and then adding them back. Alternatively, you can use the ‘Sync time’ button.", textAlign = TextAlign.Center)
             }
-            Text("Thanks for using the app", modifier = Modifier.padding(10.dp))
+            Row {
+                Button(onClick = { updateAndEnableAlarm(coroutineScope) }) {
+                    Text("Sync time")
+                }
+            }
+            Row {
+                Text("Showing and hiding time can take 1-2 minutes to take effect.", textAlign = TextAlign.Center, modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 0.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Show time")
+                Checkbox(checked = showTime.value, onCheckedChange = {
+                    showTime.value = it
+                    saveShowTime(it)
+                    updateAndEnableAlarm(CoroutineScope(Dispatchers.Main))
+                })
+            }
+
+            Text("Thanks for using the app")
             if (!isPerms.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Button(onClick = {
                     val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
@@ -167,6 +183,11 @@ class MainActivity : ComponentActivity() {
         } else {
             true
         }
+    }
+
+    private fun saveShowTime(boolean: Boolean) {
+        val sharedPref = getSharedPreferences(packageName, Context.MODE_PRIVATE)
+        sharedPref.edit().putBoolean("showTime", boolean).apply()
     }
 
     @Composable

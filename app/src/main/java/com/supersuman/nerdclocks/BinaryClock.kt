@@ -1,6 +1,8 @@
 package com.supersuman.nerdclocks
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.os.Build
@@ -58,6 +60,7 @@ class BinaryClockk : GlanceAppWidget() {
         val sdf = SimpleDateFormat("hh:mm")
         val currentDate = sdf.format(Date())
         println("updating widget at $currentDate")
+        val showTime = isShowTime(context)
         provideContent {
             Column(
                 modifier = GlanceModifier
@@ -73,8 +76,10 @@ class BinaryClockk : GlanceAppWidget() {
                     MyColumn(currentDate, 3)
                     MyColumn(currentDate, 4)
                 }
-                Row {
-                    Text(currentDate, style = TextStyle(color = ColorProvider(Color.White)))
+                if (showTime) {
+                    Row {
+                        Text(currentDate, style = TextStyle(color = ColorProvider(Color.White)))
+                    }
                 }
             }
         }
