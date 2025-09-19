@@ -21,6 +21,7 @@ class WidgetBroadcastReceiver: BroadcastReceiver() {
             context?.let {
                 BinaryClockReceiverr().glanceAppWidget.updateAll(it)
                 FibonacciClockReceiverr().glanceAppWidget.updateAll(it)
+                TextClockReceiverr().glanceAppWidget.updateAll(it)
                 println("force updating widgets")
             }
         }
