@@ -1,7 +1,7 @@
-package com.supersuman.nerdclocks
+package com.supersuman.nerdclocks.ui.widgets
 
 import android.content.Context
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -10,59 +10,62 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.unit.ColorProvider
+import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
+import com.supersuman.nerdclocks.R
+import com.supersuman.nerdclocks.WidgetUpdateScheduler
+import com.supersuman.nerdclocks.ui.screens.getShowTime
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
+import java.util.Locale
 
-class TextClockReceiverr : GlanceAppWidgetReceiver() {
+class TextClockReceiver : GlanceAppWidgetReceiver() {
 
-    override val glanceAppWidget: GlanceAppWidget = TextClockk()
-    override fun onEnabled(context: Context?) {
+    override val glanceAppWidget: GlanceAppWidget = TextClock()
+    override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        println("setting alarm")
-        context?.let { enableWidget(it) }
-        cancelAlarmManager(context)
-        setAlarmManager(context)
+        WidgetUpdateScheduler.scheduleNextMinuteUpdate(context)
     }
 
-    override fun onDisabled(context: Context?) {
+    override fun onDisabled(context: Context) {
         super.onDisabled(context)
-        context?.let { disableWidget(it) }
-        println("cancelling alarm")
-        cancelAlarmManager(context)
+        WidgetUpdateScheduler.cancelIfNoWidgets(context)
     }
 }
 
-class TextClockk : GlanceAppWidget() {
+class TextClock : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
 
-        val black = TextStyle(color = ColorProvider(R.color.grey))
-        val white = TextStyle(color = ColorProvider(R.color.white))
+        val black = TextStyle(color = ColorProvider(Color.Black))
+        val white = TextStyle(color = ColorProvider(Color.White))
 
         fun getTextStyle(time: String, text: String): TextStyle {
             if(time.contains(text)) return white
             return black
         }
 
+        val now = Calendar.getInstance().time
+        val timeText: String = SimpleDateFormat("hh:mm", Locale.getDefault()).format(now)
+        val showTime = getShowTime(context)
+
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        val hourText = getHourText(hour, minute)
+        val minText = getMinuteText(minute)
+
         provideContent {
-            val calendar = Calendar.getInstance()
-            val hour = calendar.get(Calendar.HOUR)
-            val minute = calendar.get(Calendar.MINUTE)
-
-            val hourText = getHourText(hour, minute)
-            val minText = getMinuteText(minute)
-
-            Column(GlanceModifier.padding(12.dp)
-                .background(ImageProvider(R.drawable.rounded_bg))) {
+            Column(GlanceModifier.padding(12.dp).background(ImageProvider(R.drawable.rounded_bg))) {
                 Row(GlanceModifier.fillMaxWidth()) {
                     Text("IT", style = white)
                     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -116,6 +119,11 @@ class TextClockk : GlanceAppWidget() {
                     Text("TWELVE", style = getTextStyle(hourText, "TWELVE"))
                     Spacer(modifier = GlanceModifier.defaultWeight())
                     Text("O'CLOCK", style = getTextStyle(minText, "O'CLOCK"))
+                }
+                if(showTime) {
+                    Row (modifier = GlanceModifier.fillMaxSize(), verticalAlignment = Alignment.Vertical.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(timeText, style = TextStyle(color = ColorProvider(Color.White)))
+                    }
                 }
             }
         }

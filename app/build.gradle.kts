@@ -48,8 +48,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
-    implementation("androidx.glance:glance:1.1.1")
     implementation("androidx.glance:glance-appwidget:1.1.1")
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
 
 }
