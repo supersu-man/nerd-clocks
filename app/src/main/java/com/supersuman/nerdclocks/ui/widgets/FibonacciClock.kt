@@ -58,7 +58,8 @@ class FibonacciClock : GlanceAppWidget() {
     }
 
     fun getColorsMap(): MutableMap<Number, ImageProvider> {
-        val hour = Calendar.getInstance().get(Calendar.HOUR)
+        val rawHour = Calendar.getInstance().get(Calendar.HOUR)
+        val hour = if (rawHour == 0) 12 else rawHour
         val minute = Calendar.getInstance().get(Calendar.MINUTE)
         val hourList = partitions(hour)[Random.nextInt(0, partitions(hour).size)]
         val minuteList = partitions(minute/5)[Random.nextInt(0, partitions(minute/5).size)]
@@ -95,7 +96,7 @@ class FibonacciClock : GlanceAppWidget() {
             3 -> listOf(listOf(3), listOf(2, 1.1), listOf(2, 1.2))
             2 -> listOf(listOf(2), listOf(1.1, 1.2))
             1 -> listOf(listOf(1.1), listOf(1.2))
-            else -> listOf()
+            else -> listOf(emptyList())
         }
     }
 
