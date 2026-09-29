@@ -19,7 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.Calendar
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 object WidgetUpdateScheduler {
     private const val REQUEST_CODE = 1001
@@ -65,16 +66,13 @@ object WidgetUpdateScheduler {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Align to next minute boundary
-        val calendar = Calendar.getInstance().apply {
-            add(Calendar.MINUTE, 1)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
+        // Align to next minute boundary using java.time
+        val nextMinute = LocalDateTime.now().plusMinutes(1).withSecond(0).withNano(0)
+        val triggerAtMillis = nextMinute.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
+            triggerAtMillis,
             pendingIntent
         )
         println("scheduleNextMinuteUpdate")
