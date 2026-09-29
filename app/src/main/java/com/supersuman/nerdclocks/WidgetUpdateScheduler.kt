@@ -16,14 +16,17 @@ import com.supersuman.nerdclocks.ui.widgets.TextClock
 import com.supersuman.nerdclocks.ui.widgets.TextClockReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
 object WidgetUpdateScheduler {
     private const val REQUEST_CODE = 1001
+    private val schedulerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
 
-    fun forceUpdateWidgets(context: Context) = CoroutineScope(Dispatchers.Default).launch {
+    fun forceUpdateWidgets(context: Context): Job = schedulerScope.launch {
         BinaryClock().updateAll(context)
         FibonacciClock().updateAll(context)
         TextClock().updateAll(context)
