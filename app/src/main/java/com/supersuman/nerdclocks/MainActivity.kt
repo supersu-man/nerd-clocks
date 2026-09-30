@@ -22,9 +22,10 @@ import com.supersuman.nerdclocks.ui.screens.Home
 import com.supersuman.nerdclocks.ui.components.TopBar
 import com.supersuman.nerdclocks.ui.screens.BinaryClockInfo
 import com.supersuman.nerdclocks.ui.screens.FibonacciClockInfo
+import com.supersuman.nerdclocks.ui.screens.HexClockInfo
 
 class MainActivity : ComponentActivity() {
-    private val pages = listOf("Home", "Binary", "Fibonacci")
+    private val pages = listOf("Home", "Binary", "Fibonacci", "Hex")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
                             0 -> Home()
                             1 -> BinaryClockInfo()
                             2 -> FibonacciClockInfo()
+                            3 -> HexClockInfo()
                         }
                     }
                 }
