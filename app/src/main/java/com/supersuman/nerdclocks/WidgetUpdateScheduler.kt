@@ -14,6 +14,8 @@ import com.supersuman.nerdclocks.ui.widgets.FibonacciClock
 import com.supersuman.nerdclocks.ui.widgets.FibonacciClockReceiver
 import com.supersuman.nerdclocks.ui.widgets.HexClock
 import com.supersuman.nerdclocks.ui.widgets.HexClockReceiver
+import com.supersuman.nerdclocks.ui.widgets.MorseClock
+import com.supersuman.nerdclocks.ui.widgets.MorseClockReceiver
 import com.supersuman.nerdclocks.ui.widgets.TextClock
 import com.supersuman.nerdclocks.ui.widgets.TextClockReceiver
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +36,7 @@ object WidgetUpdateScheduler {
         FibonacciClock().updateAll(context)
         TextClock().updateAll(context)
         HexClock().updateAll(context)
+        MorseClock().updateAll(context)
     }
 
     fun cancelIfNoWidgets(context: Context) {
@@ -57,8 +60,11 @@ object WidgetUpdateScheduler {
         val widget4 = appWidgetManager.getAppWidgetIds(
             ComponentName(context, HexClockReceiver::class.java)
         )
+        val widget5 = appWidgetManager.getAppWidgetIds(
+            ComponentName(context, MorseClockReceiver::class.java)
+        )
 
-        return widget1.isNotEmpty() || widget2.isNotEmpty() || widget3.isNotEmpty() || widget4.isNotEmpty()
+        return widget1.isNotEmpty() || widget2.isNotEmpty() || widget3.isNotEmpty() || widget4.isNotEmpty() || widget5.isNotEmpty()
     }
 
     @SuppressLint("ScheduleExactAlarm")
