@@ -13,8 +13,8 @@ android {
         applicationId = "com.supersuman.nerdclocks"
         minSdk = 26
         targetSdk = 37
-        versionCode = 7
-        versionName = "2.2.0"
+        versionCode = 8
+        versionName = "2.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
